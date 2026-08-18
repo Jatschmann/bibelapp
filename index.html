@@ -96,6 +96,10 @@
 
         <div id="updateCard" class="card hidden">
             <div style="font-weight:600; margin-bottom:10px;">Neuen Code einspielen</div>
+
+            <label>GitHub Token (wird nur auf diesem Gerät gespeichert)</label>
+            <input type="password" id="tokenInput" autocomplete="off" placeholder="github_pat_...">
+
             <label>Kompletten neuen Code hier einfügen</label>
             <textarea id="codeInput" placeholder="Neuen HTML-Code hier einfügen..."></textarea>
             <button id="updateBtn">Update einspielen</button>
@@ -111,8 +115,7 @@
     const GITHUB_REPO = "bibelapp";
     const GITHUB_PATH = "index.html";
     const GITHUB_BRANCH = "main";
-    const GITHUB_TOKEN = "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";
-    const ADMIN_PASSWORD = "schrift2026"; // hier kannst du dein eigenes Passwort eintragen
+    const ADMIN_PASSWORD = "1201"; // hier kannst du dein eigenes Passwort eintragen
     // =======================
 
     // --- Uhrzeit / Datum ---
@@ -134,6 +137,8 @@
         e.preventDefault();
         dashboardView.classList.add("hidden");
         updateView.classList.remove("hidden");
+        const savedToken = localStorage.getItem("gh_token");
+        if (savedToken) document.getElementById("tokenInput").value = savedToken;
     };
     document.getElementById("backLink").onclick = (e) => {
         e.preventDefault();
@@ -161,23 +166,29 @@
     // --- Update über GitHub API ---
     document.getElementById("updateBtn").onclick = async () => {
         const code = document.getElementById("codeInput").value;
+        const token = document.getElementById("tokenInput").value.trim();
         const msg = document.getElementById("updateMsg");
 
+        if (!token) {
+            msg.innerHTML = '<div class="msg err">Bitte GitHub Token eintragen.</div>';
+            return;
+        }
         if (!code.trim()) {
             msg.innerHTML = '<div class="msg err">Bitte Code einfügen.</div>';
             return;
         }
 
+        localStorage.setItem("gh_token", token);
+
         msg.innerHTML = '<div class="msg info">Hole aktuelle Version...</div>';
 
         const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
         const headers = {
-            "Authorization": `token ${GITHUB_TOKEN}`,
+            "Authorization": `token ${token}`,
             "Accept": "application/vnd.github+json"
         };
 
         try {
-            // 1. Aktuelle sha holen (nötig zum Überschreiben)
             const getRes = await fetch(`${apiUrl}?ref=${GITHUB_BRANCH}`, { headers });
             if (!getRes.ok) {
                 const errText = await getRes.text();
@@ -189,7 +200,6 @@
 
             msg.innerHTML = '<div class="msg info">Lade neue Version hoch...</div>';
 
-            // 2. Neue Version hochladen
             const putRes = await fetch(apiUrl, {
                 method: "PUT",
                 headers: { ...headers, "Content-Type": "application/json" },
