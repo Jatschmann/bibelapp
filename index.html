@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schrift</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        background: #0f1115;
+        color: #e8e6e1;
+        min-height: 100vh;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px 60px; }
+
+    .app-name { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; margin: 0 0 4px; }
+    .app-sub { color: #9a958a; font-size: 13px; margin: 0 0 40px; }
+
+    .clock-card {
+        background: #171a21; border: 1px solid #262a33; border-radius: 16px;
+        padding: 32px 20px; text-align: center; margin-bottom: 24px;
+    }
+    .time { font-size: 48px; font-weight: 700; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+    .date { color: #9a958a; font-size: 15px; margin-top: 6px; text-transform: capitalize; }
+
+    .status-row { display: flex; gap: 10px; margin-bottom: 30px; }
+    .status-pill {
+        flex: 1; background: #171a21; border: 1px solid #262a33; border-radius: 12px;
+        padding: 12px; text-align: center; font-size: 12px; color: #9a958a;
+    }
+    .status-pill b { display: block; color: #e8e6e1; font-size: 15px; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="app-name">📖 Schrift</div>
+    <div class="app-sub">Bibelstudium &amp; Gemeinschaft</div>
+
+    <div class="clock-card">
+        <div class="time" id="clockTime">--:--:--</div>
+        <div class="date" id="clockDate">-</div>
+    </div>
+
+    <div class="status-row">
+        <div class="status-pill"><b id="versionLabel">0.1.0</b>Version</div>
+        <div class="status-pill"><b>Online</b>Status</div>
+    </div>
+</div>
+
+<script>
+    function tick() {
+        const now = new Date();
+        document.getElementById("clockTime").textContent =
+            now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        document.getElementById("clockDate").textContent =
+            now.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+    }
+    tick();
+    setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
